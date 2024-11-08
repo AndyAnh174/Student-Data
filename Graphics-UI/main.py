@@ -88,17 +88,17 @@ def plot_selected_chart():
             ax.set_xlabel("Môn học")
             ax.set_ylabel("Điểm trung bình")
             ax.legend(title="Năm")
+        elif chart_type == "Biểu đồ thay đổi":
+            fig, ax = plt.subplots(figsize=(15, 6))
+            mean_scores_by_year = df.groupby("Year")[score_columns].mean()
 
-        elif chart_type == "Box Plot":
-            fig, ax = plt.subplots(figsize=(12, 6))
-            df_years[selected_year.get()][score_columns].replace(
-                -1, float("nan")
-            ).boxplot(ax=ax)
-            ax.set_title("Biểu đồ hộp cho điểm các môn học")
-            ax.set_xlabel("Môn học")
-            ax.set_ylabel("Điểm")
-            plt.xticks(rotation=45)
-
+            # Vẽ biểu đồ
+            mean_scores_by_year.plot(kind="line", marker="o", ax=ax)
+            ax.set_title("Biểu đồ thay đổi điểm trung bình các môn qua các năm")
+            ax.set_xlabel("Năm")
+            ax.set_ylabel("Điểm trung bình")
+            ax.legend(title="Môn học")
+            plt.xticks(rotation=90)
         elif chart_type == "Biểu đồ tỉnh 2018":
             fig, ax = plt.subplots(figsize=(15, 6))
             # Count the number of students by province for 2018
@@ -198,7 +198,7 @@ chart_label.grid(row=0, column=2, padx=10, pady=5)
 chart_dropdown = ttk.Combobox(
     control_frame,
     textvariable=selected_chart,
-    values=["Bar Chart", "Box Plot", "Biểu đồ tỉnh 2018", "Biểu đồ tỉnh 2019"],
+    values=["Bar Chart", "Biểu đồ thay đổi", "Biểu đồ tỉnh 2018", "Biểu đồ tỉnh 2019"],
 )
 chart_dropdown.grid(row=0, column=3, padx=10, pady=5)
 
