@@ -13,4 +13,5 @@
 ### Xây dựng giao diện chương trình (optional).
 
 ## Lưu ý
+[Click vào nhận task nha](https://andyanh.id.vn) vào phần task đã gửi task riêng
 Chạy lệnh ở Cleaning_data: python -m Cleaning_data.main
