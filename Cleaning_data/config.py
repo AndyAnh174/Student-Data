@@ -39,3 +39,4 @@ except Exception as e:
     print(f"Lỗi khi tải dữ liệu từ API: {e}")
     print("Không thể tải dữ liệu. Vui lòng kiểm tra kết nối internet và thử lại.")
     exit()
+
