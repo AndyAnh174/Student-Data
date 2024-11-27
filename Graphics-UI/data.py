@@ -42,3 +42,4 @@ except Exception as e:
     print("Không thể tải dữ liệu. Vui lòng kiểm tra kết nối internet và thử lại.")
     exit()
 cached = "cleaned_data_cache.csv"
+print(df.dtypes)
