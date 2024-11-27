@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
-from data import df, df_2, df_years, cleaned_file_path
+from data import df, df_2, df_years, cached
 from pandas import DataFrame
 import time
 import os
@@ -14,6 +14,7 @@ start_time = time.time()
 root = Tk()
 root.title("Chương trình xử lý dữ liệu")
 root.geometry("1000x600")
+root.config(bg="blue")
 score_columns = [
     "Toan",
     "Van",
@@ -27,15 +28,15 @@ score_columns = [
 ]
 
 
-control_frame = Frame(root)
+control_frame = Frame(root, bg="lightblue")
 control_frame.pack(pady=10)
 
 # Widget Notebook để tạo các tab
 notebook = ttk.Notebook(root)
 notebook.pack(fill="both", expand=True)
 # Các khung cho tab Biểu Đồ và Bảng Dữ Liệu
-plot_frame = Frame(notebook)
-data_frame = Frame(notebook)
+plot_frame = Frame(notebook, bg="lightblue")
+data_frame = Frame(notebook, bg="lightblue")
 notebook.add(plot_frame, text="Biểu Đồ")
 notebook.add(data_frame, text="Bảng Dữ Liệu")
 # Các biến toàn cục cho phân trang
@@ -45,43 +46,45 @@ selected_year = IntVar(value=2018)
 selected_chart = StringVar(value="Bar Chart")
 
 # Khung cho tab Tìm Kiếm
-search_frame = Frame(notebook)
+search_frame = Frame(notebook, bg="lightblue")
 notebook.add(search_frame, text="Tìm Kiếm")
-# Khung để hiển thị kết quả
+
+# Khung nhập liệu và nút tìm kiếm
+search_label = Label(search_frame, text="Nhập SBD:")
+search_label.grid(row=0, column=0, padx=5, pady=5, sticky="w")
+
+sbd_entry = Entry(search_frame)
+sbd_entry.grid(row=0, column=1, padx=5, pady=5)
+
+# Khung hiển thị kết quả
 result_frame = Frame(search_frame)
 result_frame.grid(row=1, column=0, columnspan=3, padx=5, pady=10, sticky="nsew")
 
-# Label kết quả
-result_label = Label(result_frame, text="")
-result_label.pack(pady=10)
-
-# Biến để lưu kết quả tìm kiếm
-result_text = StringVar()
-result_label = Label(result_frame, textvariable=result_text)
+# Label để hiển thị kết quả
+result_label = Label(result_frame, text="", wraplength=400, justify="left", anchor="w")
 result_label.pack(pady=10)
 
 
 # Hàm tìm kiếm theo SBD
 def search_by_sbd():
-    # Lấy giá trị nhập vào từ ô SBD và năm chọn
     sbd = sbd_entry.get()
     year = selected_year.get()
 
-    # Kiểm tra dữ liệu tồn tại
-    if year not in df_years:
-        result_label.config(text="Năm không hợp lệ")
+    # Kiểm tra xem năm có dữ liệu không
+    if year not in df_years or df_years[year].empty:
+        result_label.config(text=f"Dữ liệu năm {year} không tồn tại.")
         return
 
-    # Lọc dữ liệu theo SBD
-    result = df_years[year][df_years[year]["SBD"] == sbd]
+    # Tìm kiếm với SBD chuyển sang chuỗi tạm thời
+    result = df_years[year][df_years[year]["SBD"].astype(str) == sbd]
 
     if not result.empty:
-        # Hiển thị kết quả
-        result_label.config(text=f"Kết quả tìm kiếm cho SBD {sbd}:")
-
-        # Lấy điểm của tất cả các môn thi và lọc bỏ những môn có điểm -1
-        points = result.iloc[0][
-            [
+        # Lấy thông tin kết quả
+        row = result.iloc[0]
+        ten_tinh = row["TenTinh"]
+        valid_points = {
+            subject: row[subject]
+            for subject in [
                 "Toan",
                 "Van",
                 "Ly",
@@ -92,30 +95,18 @@ def search_by_sbd():
                 "Dia ly",
                 "GDCD",
             ]
-        ].to_dict()
-
-        # Lọc ra những môn có điểm hợp lệ (không phải -1)
-        valid_points = {
-            subject: points[subject] for subject in points if points[subject] != -1
+            if row[subject] != -1.0
         }
-
-        # Tạo chuỗi kết quả để hiển thị
-        result_text.set(
-            f"SBD: {result['SBD'].values[0]} | Tên: {result['TenTinh'].values[0]} | "
-            + " | ".join(
-                [f"{subject}: {valid_points[subject]}" for subject in valid_points]
+        # Hiển thị kết quả
+        result_label.config(
+            text=f"Kết quả cho SBD {sbd} - {ten_tinh}:\n"
+            + " ".join(
+                [f"{subject}: {score}" for subject, score in valid_points.items()]
             )
         )
     else:
-        result_label.config(text=f"Không tìm thấy SBD {sbd} trong năm {year}")
+        result_label.config(text=f"Không tìm thấy SBD {sbd} trong năm {year}.")
 
-
-# Thêm giao diện tìm kiếm trong tab "Tìm Kiếm" với grid layout
-search_label = Label(search_frame, text="Nhập SBD:")
-search_label.grid(row=0, column=0, padx=5, pady=5, sticky="w")
-
-sbd_entry = Entry(search_frame)
-sbd_entry.grid(row=0, column=1, padx=5, pady=5)
 
 search_button = Button(search_frame, text="Tìm kiếm", command=search_by_sbd)
 search_button.grid(row=0, column=2, padx=5, pady=5)
@@ -125,7 +116,7 @@ def open_file_explorer():
     try:
         # Lấy thư mục chứa tệp hiện tại
         file_directory = os.path.dirname(
-            os.path.abspath(cleaned_file_path)
+            os.path.abspath(cached)
         )  # Đối với tệp cleaned_data
         # Mở thư mục trong File Explorer (Windows)
         if os.name == "nt":  # Nếu hệ điều hành là Windows
@@ -440,5 +431,8 @@ end_time = time.time()
 
 elapsed_time = end_time - start_time
 print(f"Thời gian khởi động: {elapsed_time:.2f} giây.")
+thoi_gian = Label(control_frame, text=f"Thời gian khởi động: {elapsed_time:.2f} giây.")
+thoi_gian.grid(row=0, column=6, padx=10, pady=5)
+
 
 root.mainloop()
