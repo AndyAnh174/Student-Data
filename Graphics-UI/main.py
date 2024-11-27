@@ -1,11 +1,16 @@
+import time
+
+start_time = time.time()
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
 from data import df, df_2, df_years, cached
+from delete import create_delete_window
+from update import create_update_window
+from add import create_add_window
 from pandas import DataFrame
-import time
 import os
 import subprocess
 
@@ -69,7 +74,6 @@ result_label.pack(pady=10)
 def search_by_sbd():
     sbd = sbd_entry.get()
     year = selected_year.get()
-
     # Kiểm tra xem năm có dữ liệu không
     if year not in df_years or df_years[year].empty:
         result_label.config(text=f"Dữ liệu năm {year} không tồn tại.")
@@ -188,9 +192,8 @@ subject_dropdown = ttk.Combobox(
 )
 subject_dropdown.grid(row=0, column=5, padx=10, pady=5)
 
-
 # Hàm hiển thị dữ liệu trong bảng với phân trang
-def display_data(dataframe, page=0):
+def display_data( dataframe, page=0):
     for widget in data_frame.winfo_children():
         widget.destroy()
 
@@ -409,6 +412,9 @@ menu_bar = Menu(root)
 # Menu File
 file_menu = Menu(menu_bar, tearoff=0)
 file_menu.add_command(label="Mở tới nơi chứa file", command=open_file_explorer)
+file_menu.add_command(label="Xóa thông tin", command=lambda: create_delete_window(root))
+file_menu.add_command(label="Cập nhật thông tin", command=lambda: create_update_window(root))
+file_menu.add_command(label="Thêm dữ liệu", command=lambda: create_add_window(root))
 file_menu.add_command(label="Thoát", command=exit_app)
 menu_bar.add_cascade(label="File", menu=file_menu)
 # Menu View
@@ -417,10 +423,6 @@ view_menu.add_command(label="Hiển thị dữ liệu", command=load_data)
 view_menu.add_command(label="Hiển thị biểu đồ", command=plot_selected_chart)
 view_menu.add_command(label="Xóa biểu đồ", command=clear_plot)
 menu_bar.add_cascade(label="View", menu=view_menu)
-# Menu File
-file_menu = Menu(menu_bar, tearoff=0)
-file_menu.add_command(label="Thoát", command=exit_app)
-menu_bar.add_cascade(label="File", menu=file_menu)
 # Menu Settings
 settings_menu = Menu(menu_bar, tearoff=0)
 settings_menu.add_command(
