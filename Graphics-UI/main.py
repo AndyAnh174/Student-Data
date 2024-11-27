@@ -1,11 +1,16 @@
+import time
+
+start_time = time.time()
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
 from data import df, df_2, df_years, cached
+from delete import create_delete_window
+from update import create_update_window
+from add import create_add_window
 from pandas import DataFrame
-import time
 import os
 import subprocess
 
@@ -69,7 +74,6 @@ result_label.pack(pady=10)
 def search_by_sbd():
     sbd = sbd_entry.get()
     year = selected_year.get()
-
     # Kiểm tra xem năm có dữ liệu không
     if year not in df_years or df_years[year].empty:
         result_label.config(text=f"Dữ liệu năm {year} không tồn tại.")
@@ -108,7 +112,9 @@ def search_by_sbd():
         result_label.config(text=f"Không tìm thấy SBD {sbd} trong năm {year}.")
 
 
-search_button = Button(search_frame, text="Tìm kiếm", command=search_by_sbd)
+search_button = Button(
+    search_frame, text="Tìm kiếm", command=search_by_sbd, bg="dodgerblue"
+)
 search_button.grid(row=0, column=2, padx=5, pady=5)
 
 
@@ -128,14 +134,42 @@ def open_file_explorer():
         messagebox.showerror("Lỗi", f"Không thể mở thư mục: {e}")
 
 
+# Stack lưu các biểu đồ đã vẽ
+plot_stack = []
+
+
+# Hàm hiển thị biểu đồ và lưu vào stack
 def display_plot(fig):
+    global plot_stack
+    plot_stack.append(fig)  # Lưu biểu đồ vào stack
     for widget in plot_frame.winfo_children():
         widget.destroy()
 
-    # Nhúng biểu đồ vào Tkinter bằng FigureCanvasTkAgg
     canvas = FigureCanvasTkAgg(fig, master=plot_frame)
     canvas.draw()
     canvas.get_tk_widget().pack(fill="both", expand=True)
+
+
+# Hàm quay lại biểu đồ trước
+def back_to_previous_plot():
+    global plot_stack
+    if len(plot_stack) > 1:
+        plot_stack.pop()  # Loại bỏ biểu đồ hiện tại
+        previous_fig = plot_stack[-1]
+        for widget in plot_frame.winfo_children():
+            widget.destroy()
+        canvas = FigureCanvasTkAgg(previous_fig, master=plot_frame)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill="both", expand=True)
+    else:
+        messagebox.showinfo("Thông báo", "Không có biểu đồ trước để quay lại.")
+
+
+# Thêm nút "Back" vào control_frame
+back_button = Button(
+    control_frame, text="Quay lại", command=back_to_previous_plot, bg="lightblue"
+)
+back_button.grid(row=1, column=4, padx=10, pady=5)
 
 
 # Hàm để xóa biểu đồ khỏi màn hình
@@ -158,9 +192,8 @@ subject_dropdown = ttk.Combobox(
 )
 subject_dropdown.grid(row=0, column=5, padx=10, pady=5)
 
-
 # Hàm hiển thị dữ liệu trong bảng với phân trang
-def display_data(dataframe, page=0):
+def display_data( dataframe, page=0):
     for widget in data_frame.winfo_children():
         widget.destroy()
 
@@ -242,7 +275,6 @@ def plot_selected_chart():
             mean_scores_by_year.plot(kind="line", marker="o", ax=ax)
             ax.set_title("Biểu đồ thay đổi điểm trung bình")
             ax.set_ylabel("Điểm trung bình")
-            ax.legend(title="Môn học")
             plt.xticks(rotation=90)
 
         elif chart_type == "Phân phối điểm 2018":
@@ -349,13 +381,19 @@ chart_dropdown = ttk.Combobox(
 )
 chart_dropdown.grid(row=0, column=3, padx=10, pady=5)
 
-plot_button = Button(control_frame, text="Vẽ biểu đồ", command=plot_selected_chart)
+plot_button = Button(
+    control_frame, text="Vẽ biểu đồ", command=plot_selected_chart, bg="dodgerblue"
+)
 plot_button.grid(row=0, column=4, padx=10, pady=5)
 
-load_data_button = Button(control_frame, text="Tải dữ liệu", command=load_data)
+load_data_button = Button(
+    control_frame, text="Tải dữ liệu", command=load_data, bg="dodgerblue"
+)
 load_data_button.grid(row=1, column=0, columnspan=2, padx=10, pady=5)
 
-clear_plot_button = Button(control_frame, text="Xóa biểu đồ", command=clear_plot)
+clear_plot_button = Button(
+    control_frame, text="Xóa biểu đồ", command=clear_plot, bg="lightcoral"
+)
 clear_plot_button.grid(row=1, column=2, columnspan=2, padx=10, pady=5)
 
 
@@ -374,6 +412,9 @@ menu_bar = Menu(root)
 # Menu File
 file_menu = Menu(menu_bar, tearoff=0)
 file_menu.add_command(label="Mở tới nơi chứa file", command=open_file_explorer)
+file_menu.add_command(label="Xóa thông tin", command=lambda: create_delete_window(root))
+file_menu.add_command(label="Cập nhật thông tin", command=lambda: create_update_window(root))
+file_menu.add_command(label="Thêm dữ liệu", command=lambda: create_add_window(root))
 file_menu.add_command(label="Thoát", command=exit_app)
 menu_bar.add_cascade(label="File", menu=file_menu)
 # Menu View
@@ -382,10 +423,6 @@ view_menu.add_command(label="Hiển thị dữ liệu", command=load_data)
 view_menu.add_command(label="Hiển thị biểu đồ", command=plot_selected_chart)
 view_menu.add_command(label="Xóa biểu đồ", command=clear_plot)
 menu_bar.add_cascade(label="View", menu=view_menu)
-# Menu File
-file_menu = Menu(menu_bar, tearoff=0)
-file_menu.add_command(label="Thoát", command=exit_app)
-menu_bar.add_cascade(label="File", menu=file_menu)
 # Menu Settings
 settings_menu = Menu(menu_bar, tearoff=0)
 settings_menu.add_command(
