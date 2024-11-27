@@ -8,12 +8,12 @@ import delete
 from datetime import datetime, timedelta
 import os
 # API URLs
-cleaned_data_api = 'https://andyanh.id.vn/index.php/s/AQrkaif3HWgs9ke/download'
+row_data_api = 'https://andyanh.id.vn/index.php/s/p7XMy828G8NKiZp/download'
 
 def fetch_csv_from_api(api_url):
 
     
-    cache_file = 'cleaned_data_cache.csv' if 'AQrka' in api_url else 'tinh_cache.csv'
+    cache_file = 'row_data_cache.csv' if 'p7XMy' in api_url else 'tinh_cache.csv'
     cache_timeout = timedelta(hours=24)
     
     if os.path.exists(cache_file):
@@ -33,7 +33,7 @@ def fetch_csv_from_api(api_url):
 
 # Tải dữ liệu
 try:
-    df = fetch_csv_from_api(cleaned_data_api)
+    df = fetch_csv_from_api(row_data_api)
     print("Đã tải dữ liệu thành công từ API")
 except Exception as e:
     print(f"Lỗi khi tải dữ liệu từ API: {e}")
@@ -62,7 +62,7 @@ def List_manager():
         elif choice == '4':
             df = delete.delete_student(df)
         elif choice == '5':
-            updated_file_path = 'C:/Users/admin/Nextcloud4/andyanh/Data-Project-Student-Manager/Updated_Data.csv'  # Đường dẫn tương đối để lưu file cập nhật
+            updated_file_path = 'C:/Users/admin/Nextcloud4/andyanh/Data-Project-Student-Manager/Update Data/Updated_Data.csv'  # Đường dẫn tương đối để lưu file cập nhật
             df.to_csv(updated_file_path, index=False)
             print("Đã lưu thay đổi vào Updated_Data.csv và thoát.")
             break
