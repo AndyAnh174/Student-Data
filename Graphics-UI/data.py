@@ -37,7 +37,6 @@ try:
 
     # Lọc dữ liệu theo năm
     df_years = {2018: df[df["Year"] == 2018], 2019: df[df["Year"] == 2019]}
-
 except Exception as e:
     print(f"Lỗi khi tải dữ liệu: {e}")
     print("Không thể tải dữ liệu. Vui lòng kiểm tra kết nối internet và thử lại.")
