@@ -272,7 +272,6 @@ def plot_selected_chart():
             mean_scores_by_year.plot(kind="line", marker="o", ax=ax)
             ax.set_title("Biểu đồ thay đổi điểm trung bình")
             ax.set_ylabel("Điểm trung bình")
-            ax.legend(title="Môn học")
             plt.xticks(rotation=90)
 
         elif chart_type == "Phân phối điểm 2018":
