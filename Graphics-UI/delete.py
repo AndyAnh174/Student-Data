@@ -1,13 +1,14 @@
 from tkinter import *
 from tkinter import messagebox
-from data import cached,df,df_years
-
+from data import cached,df,df_years,save_history
 def create_delete_window(parent):
     """
     Hàm tạo giao diện xóa thông tin (module con).
     :param parent: Cửa sổ chính (root)
     """
-    global df  # Sử dụng biến toàn cục
+
+
+    global df  #biến toàn cục
 
     # Tạo cửa sổ con
     delete_window = Toplevel(parent)
@@ -34,12 +35,18 @@ def create_delete_window(parent):
 
         # Lọc dữ liệu để loại bỏ dòng cần xóa
         initial_length = len(df)
+        condition = (df["SBD"] == sbd) & (df["Year"] == year)
+        deleted_row = df.loc[condition] 
         df = df[~((df["SBD"] == sbd) & (df["Year"] == year))]
         global df_years
         df_years = {2018: df[df["Year"] == 2018], 2019: df[df["Year"] == 2019]}
         # Kiểm tra xem có dòng nào bị xóa không
         if len(df) < initial_length:
-            # Ghi lại vào file CSV
+            # Ghi lại vào file CSV # Dòng bị xóa từ DataFrame chính
+            if not deleted_row.empty:
+                row = deleted_row.iloc[0]
+                save_history(row, "XÓA")
+
             df.to_csv(cached, index=False)
             messagebox.showinfo("Thành công", f"Đã xóa thông tin của SBD {sbd} và Năm {year}.\n Khởi động lại chương trình để xem cập nhật", parent=delete_window)
         else:

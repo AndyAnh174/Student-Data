@@ -6,14 +6,14 @@ import matplotlib.pyplot as plt
 from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
-from data import df, df_2, df_years, cached
+from data import df, df_2, df_years, cached,history_file
 from delete import create_delete_window
 from update import create_update_window
 from add import create_add_window
 from pandas import DataFrame
+import pandas as pd
 import os
 import subprocess
-
 # Bắt đầu đo thời gian
 start_time = time.time()
 root = Tk()
@@ -44,11 +44,6 @@ plot_frame = Frame(notebook, bg="lightblue")
 data_frame = Frame(notebook, bg="lightblue")
 notebook.add(plot_frame, text="Biểu Đồ")
 notebook.add(data_frame, text="Bảng Dữ Liệu")
-# Các biến toàn cục cho phân trang
-current_page = 0
-page_size = 50
-selected_year = IntVar(value=2018)
-selected_chart = StringVar(value="Bar Chart")
 
 # Khung cho tab Tìm Kiếm
 search_frame = Frame(notebook, bg="lightblue")
@@ -69,6 +64,11 @@ result_frame.grid(row=1, column=0, columnspan=3, padx=5, pady=10, sticky="nsew")
 result_label = Label(result_frame, text="", wraplength=400, justify="left", anchor="w")
 result_label.pack(pady=10)
 
+# Các biến toàn cục cho phân trang
+current_page = 0
+page_size = 50
+selected_year = IntVar(value=2018)
+selected_chart = StringVar(value="Bar Chart")
 
 # Hàm tìm kiếm theo SBD
 def search_by_sbd():
@@ -338,7 +338,20 @@ def plot_selected_chart():
     except Exception as e:
         messagebox.showerror("Lỗi", f"Không thể tạo biểu đồ: {e}")
 
-
+def xemlichsu():
+    global current_page
+    current_page = 0  # Đặt lại trang đầu tiên
+    dataframe = pd.read_csv(history_file)
+    display_data(dataframe, current_page)
+    messagebox.showinfo("Thông báo", f"Đã tải lịch sử thành công!")
+def xoalichsu():
+    try:
+        dataframe = pd.read_csv(history_file)
+        # Xóa toàn bộ dữ liệu, chỉ giữ lại tiêu đề
+        dataframe.iloc[0:0].to_csv(history_file, index=False)
+        messagebox.showinfo("Thông báo", f"Đã xóa toàn bộ lịch sử thành công!")
+    except FileNotFoundError:
+        print("File lịch sử không tồn tại.")
 # Hàm tải dữ liệu được chọn và đặt lại phân trang
 def load_data():
     global current_page
@@ -444,6 +457,8 @@ settings_menu.add_command(
         "Sử dụng dropdown để chọn kiểu biểu đồ trong phần điều khiển.",
     ),
 )
+settings_menu.add_command(label="Xem lịch sử", command=xemlichsu)
+settings_menu.add_command(label="Xóa lịch sử", command=xoalichsu)
 menu_bar.add_cascade(label="Settings", menu=settings_menu)
 
 # Menu Help

@@ -42,4 +42,36 @@ except Exception as e:
     print("Không thể tải dữ liệu. Vui lòng kiểm tra kết nối internet và thử lại.")
     exit()
 cached = "cleaned_data_cache.csv"
+history_file="history.csv"
+def save_history(row, status):
+    """
+    Ghi lại thông tin dòng bị xóa hoặc cập nhật vào file CSV.
+    :param row: Dòng dữ liệu (Series) từ DataFrame.
+    :param status: Trạng thái thay đổi (Ví dụ: "XÓA", "CẬP NHẬT").
+    """
+    # Sao chép dòng để tránh cảnh báo SettingWithCopyWarning
+    row_copy = row.copy()
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    # Thêm các cột mới vào bản sao
+    row_copy["TrangThai"] = status
+    row_copy["Timestamp"] = timestamp
+    
+    # Tạo một DataFrame từ bản sao
+    history_df = pd.DataFrame([row_copy])
+    
+    try:
+        # Đọc dữ liệu cũ từ file CSV
+        existing_data = pd.read_csv(history_file)
+        
+        # Gộp dữ liệu mới với dữ liệu cũ
+        history_df = pd.concat([existing_data, history_df], ignore_index=True)
+    except FileNotFoundError:
+        # Nếu file không tồn tại, tạo mới
+        print(f"File '{history_file}' không tồn tại. Tạo file mới.")
+    
+    # Ghi lại dữ liệu vào file CSV
+    history_df.to_csv(history_file, index=False)
+    print(f"Lịch sử đã được ghi vào file '{history_file}'.")
+
 print(df.dtypes)
