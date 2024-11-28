@@ -8,7 +8,7 @@ def create_delete_window(parent):
     """
 
 
-    global df  # Sử dụng biến toàn cục
+    global df  #biến toàn cục
 
     # Tạo cửa sổ con
     delete_window = Toplevel(parent)
