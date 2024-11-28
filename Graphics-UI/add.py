@@ -1,8 +1,8 @@
 from tkinter import *
 from tkinter import messagebox
-from data import cached,df
+from data import cached,df,save_history
 import pandas as pd
-
+from datetime import datetime
 def create_add_window(parent):
     """
     Hàm tạo cửa sổ con để thêm một dòng dữ liệu mới.
@@ -16,7 +16,6 @@ def create_add_window(parent):
     # Hàm thêm dữ liệu vào DataFrame
     def add_entry():
         global df  # Sử dụng biến toàn cục df
-
         # Lấy giá trị từ các ô nhập liệu
         sbd = entry_sbd.get().strip()
         year = entry_year.get().strip()
@@ -73,15 +72,17 @@ def create_add_window(parent):
 
         # Chuyển dữ liệu mới thành DataFrame
         new_data_df = pd.DataFrame([new_data])
-
+                       
+        if not new_data_df.empty:
+            row = new_data_df.iloc[0]
+            save_history(row, "THÊM MỚI")
         # Dùng pd.concat để kết hợp DataFrame mới với DataFrame cũ
         df = pd.concat([df, new_data_df], ignore_index=True)
         # Lưu lại DataFrame vào file CSV
         df.to_csv(cached, index=False)
 
-        # Thông báo thành công và đóng cửa sổ
+        # Thông báo thành công 
         messagebox.showinfo("Thành công", f"Đã thêm dữ liệu cho SBD {sbd}.\n Khởi động lại chương trình để xem cập nhật", parent=add_window)
-        add_window.destroy()
 
     # Nhãn và ô nhập cho các trường
     Label(add_window, text="Số Báo Danh (SBD):").grid(row=0, column=0, padx=10, pady=5, sticky="e")

@@ -1,7 +1,6 @@
 from tkinter import *
 from tkinter import messagebox
-
-from data import cached,df
+from data import cached,df,save_history
 def create_update_window(parent):
     """
     Hàm tạo giao diện cập nhật thông tin (module con).
@@ -48,6 +47,10 @@ def create_update_window(parent):
         if condition.any():
             # Hiển thị hộp xác nhận trước khi cập nhật
             def confirm_update():
+                update_row = df.loc[condition] 
+                if not update_row.empty:
+                    row = update_row.iloc[0]
+                    save_history(row, "CẬP NHẬT")
                 # Cập nhật điểm các môn
                 if new_toan:
                     df.loc[condition, "Toan"] = float(new_toan)
