@@ -7,13 +7,16 @@ import update
 import delete
 from datetime import datetime, timedelta
 import os
-# API URLs
-row_data_api = 'https://andyanh.id.vn/index.php/s/p7XMy828G8NKiZp/download'
+
+# API URLs và đường dẫn file
+ROW_DATA_API = 'https://andyanh.id.vn/index.php/s/p7XMy828G8NKiZp/download'
+UPDATED_FILE_PATH = 'C:/Users/admin/Nextcloud4/andyanh/Data-Project-Student-Manager/Update Data/Updated_Data.csv'
 
 def fetch_csv_from_api(api_url):
-
-    
-    cache_file = 'row_data_cache.csv' if 'p7XMy' in api_url else 'tinh_cache.csv'
+    """
+    Tải dữ liệu từ API và lưu cache
+    """
+    cache_file = 'row_data_cache.csv'
     cache_timeout = timedelta(hours=24)
     
     if os.path.exists(cache_file):
@@ -29,30 +32,42 @@ def fetch_csv_from_api(api_url):
         df.to_csv(cache_file, index=False)
         return df
     else:
-        raise Exception(f"Failed to fetch data: {response.status_code}")
+        raise Exception(f"Không thể tải dữ liệu: {response.status_code}")
 
-# Tải dữ liệu
-try:
-    df = fetch_csv_from_api(row_data_api)
-    print("Đã tải dữ liệu thành công từ API")
-except Exception as e:
-    print(f"Lỗi khi tải dữ liệu từ API: {e}")
-    print("Không thể tải dữ liệu. Vui lòng kiểm tra kết nối internet và thử lại.")
-    exit()
+def load_data():
+    """
+    Tải dữ liệu ban đầu
+    """
+    try:
+        df = fetch_csv_from_api(ROW_DATA_API)
+        print("Đã tải dữ liệu thành công từ API")
+        return df
+    except Exception as e:
+        print(f"Lỗi khi tải dữ liệu từ API: {e}")
+        print("Không thể tải dữ liệu. Vui lòng kiểm tra kết nối internet và thử lại.")
+        exit()
 
 def show_menu():
-    print("\nMenu:")
-    print("1. Create (Thêm thí sinh)")
-    print("2. Read (Xem thông tin thí sinh)")
-    print("3. Update (Cập nhật thông tin thí sinh)")
-    print("4. Delete (Xóa thí sinh)")
-    print("5. Exit")
+    """
+    Hiển thị menu chức năng
+    """
+    print("\n=== QUẢN LÝ THÔNG TIN THÍ SINH ===")
+    print("1. Thêm thí sinh mới")
+    print("2. Xem thông tin thí sinh") 
+    print("3. Cập nhật thông tin thí sinh")
+    print("4. Xóa thông tin thí sinh")
+    print("5. Lưu và thoát")
 
 def List_manager():
-    global df
+    """
+    Hàm chính quản lý luồng chương trình
+    """
+    df = load_data()
+    
     while True:
         show_menu()
-        choice = input("Chọn thao tác: ")
+        choice = input("\nChọn chức năng (1-5): ")
+        
         if choice == '1':
             df = create.create_student(df)
         elif choice == '2':
@@ -62,13 +77,11 @@ def List_manager():
         elif choice == '4':
             df = delete.delete_student(df)
         elif choice == '5':
-            updated_file_path = 'C:/Users/admin/Nextcloud4/andyanh/Data-Project-Student-Manager/Update Data/Updated_Data.csv'  # Đường dẫn tương đối để lưu file cập nhật
-            df.to_csv(updated_file_path, index=False)
-            print("Đã lưu thay đổi vào Updated_Data.csv và thoát.")
+            df.to_csv(UPDATED_FILE_PATH, index=False)
+            print("Đã lưu thay đổi và thoát chương trình.")
             break
         else:
             print("Lựa chọn không hợp lệ. Vui lòng chọn lại.")
 
-# Chạy hàm List_manager khi chạy file main.py trong List_manager
 if __name__ == "__main__":
     List_manager()
