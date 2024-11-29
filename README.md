@@ -5,28 +5,29 @@ Dự án này là một hệ thống quản lý và phân tích dữ liệu sinh
 ## 📁 Cấu trúc thư mục
 
 - **📈 Chart**
-  - `chart.ipynb`: Notebook để tạo và hiển thị biểu đồ từ dữ liệu sinh viên.
 
+  - `chart.ipynb`: Notebook để tạo và hiển thị biểu đồ từ dữ liệu sinh viên.
 - **🧹 Cleaning_data**
+
   - `cleaner.py`: Mã nguồn để làm sạch dữ liệu, loại bỏ các giá trị không hợp lệ.
   - `config.py`: Cấu hình cho quá trình làm sạch dữ liệu.
   - `main.py`: Tập tin chính để chạy các chức năng làm sạch dữ liệu.
-
 - **🖥️ Graphics-UI**
+
   - `add.py`: Thêm dữ liệu sinh viên qua giao diện đồ họa.
   - `data.py`: Quản lý và hiển thị dữ liệu.
   - `delete.py`: Xóa dữ liệu sinh viên qua giao diện đồ họa.
   - `main.py`: Tập tin chính cho giao diện đồ họa.
   - `update.py`: Cập nhật dữ liệu sinh viên qua giao diện đồ họa.
-
 - **📋 List_manager**
+
   - `create.py`: Tạo danh sách sinh viên mới.
   - `delete.py`: Xóa danh sách sinh viên.
   - `main.py`: Tập tin chính để quản lý danh sách.
   - `read.py`: Đọc dữ liệu từ danh sách sinh viên.
   - `update.py`: Cập nhật danh sách sinh viên.
-
 - **📊 Standardization**
+
   - `data_struct_block.ipynb`: Notebook về cấu trúc dữ liệu của từng khối.
   - `pass_or_fail.ipynb`: Xác định sinh viên đậu hay rớt dựa trên điểm số.
   - `score_distribution.ipynb`: Phân tích phân phối điểm số của sinh viên.
@@ -42,7 +43,8 @@ Dự án này là một hệ thống quản lý và phân tích dữ liệu sinh
 
 ## 🌐 Tải dữ liệu
 
-Dữ liệu Dataset được tải về từ link: [Datasetv](https://andyanh.id.vn/index.php/s/R87b2JJT96ZiysQ). 
+Dữ liệu Dataset được tải về từ link: [Dataset](https://andyanh.id.vn/index.php/s/R87b2JJT96ZiysQ).
+Dữ liệu Dataset gốc được tải về từ link: [Kaggle](https://www.kaggle.com/datasets/phuc16102001/vietnam-highschool-exam-2017-to-2021).
 Trong các file đều chứa link API Curl để tải dữ liệu.
 
 ## 👥 Thành viên nhóm
