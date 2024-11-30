@@ -19,6 +19,7 @@ Dự án này là một hệ thống quản lý và phân tích dữ liệu sinh
   - `delete.py`: Xóa dữ liệu sinh viên qua giao diện đồ họa.
   - `main.py`: Tập tin chính cho giao diện đồ họa.
   - `update.py`: Cập nhật dữ liệu sinh viên qua giao diện đồ họa.
+  - `run_gui.sh`: Chạy scripts, kiểm tra thư viện  và tải về rồi chạy chương trình.
 - **📋 List_manager**
 
   - `create.py`: Tạo danh sách sinh viên mới.
@@ -26,13 +27,6 @@ Dự án này là một hệ thống quản lý và phân tích dữ liệu sinh
   - `main.py`: Tập tin chính để quản lý danh sách.
   - `read.py`: Đọc dữ liệu từ danh sách sinh viên.
   - `update.py`: Cập nhật danh sách sinh viên.
-- **📊 Standardization**
-
-  - `data_struct_block.ipynb`: Notebook về cấu trúc dữ liệu của từng khối.
-  - `pass_or_fail.ipynb`: Xác định sinh viên đậu hay rớt dựa trên điểm số.
-  - `score_distribution.ipynb`: Phân tích phân phối điểm số của sinh viên.
-  - `sum_all_block.ipynb`: Tổng hợp dữ liệu từ tất cả các khối.
-  - `sum_pass_fail.ipynb`: Tổng hợp dữ liệu sinh viên đậu/rớt.
 
 ## 📄 Tập tin khác
 
